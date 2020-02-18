@@ -4,12 +4,14 @@
   "description": "php and socket io project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "nodemon node server.js"
   },
   "author": "ShaiHuLuD",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "form-data": "^3.0.0",
+    "nodemon": "^2.0.2",
     "socket.io": "^2.3.0",
     "winston": "^3.2.1"
   }

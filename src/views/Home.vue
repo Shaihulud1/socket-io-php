@@ -13,6 +13,16 @@
 <script>
 export default {
     name: "Home",
+    sockets: {
+        joinStatus: function(data) {
+            if (data == "exist") {
+                this.formErrors.push("user already exist")
+            } else {
+                console.log("111")
+                localStorage.setItem("userID", data)
+            }
+        }
+    },
     methods: {
         enterUser: function(e) {
             e.preventDefault()
@@ -23,8 +33,7 @@ export default {
             if (this.formErrors.length > 0) {
                 return
             }
-
-            console.log(e)
+            this.$socket.emit("joinUser", this.nickname)
         }
     },
     components: {},
