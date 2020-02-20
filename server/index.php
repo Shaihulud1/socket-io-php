@@ -2,15 +2,35 @@
 if(isset($_POST['method']))
 {
     $result = [];
+    $mysql = new mysqlHelper;
     switch ($_POST['method']) {
         case 'userJoin':
-            $mysql = new mysqlHelper;
             if($mysql->isUserExist($_POST['nickname'])){
                 $result = ['result' => 'exist'];
             }else{
                 $id = $mysql->newUser($_POST['nickname']);
                 $result = ['result' => $id];
             }
+        break;
+        case 'isExistID': 
+            if($mysql->isExistUserByID((int)$_POST['id'])){
+                $result = ['result' => 'exist'];
+            }else{
+                $result = ['result' => 'notExist'];
+            }
+        break;
+        case 'getUserDataByID':
+            $userData = $mysql->getUserDataByID((int)$_POST['id']);   
+            $result = ['result' => $userData ? $userData : 'notExist'];                         
+        break;
+        case 'sendMessage':
+            if($mysql->isExistUserByID((int)$_POST['id'])){
+                $this->messData($_POST);
+                $result = ['result' => 'success'];
+            }else{
+                $result = ['result' => 'failed'];
+            }
+
         break;
     }
     print_r(json_encode($result));
@@ -27,14 +47,36 @@ class mysqlHelper{
         }
     }
 
-    public function isUserExist($name): bool
+    public function newMessage(array $messData)
+    {
+        $this->conn->query("INSERT INTO mess (userID, message) VALUES (".$messData['userID']."'".$messData['message']."')");
+    }
+
+    public function getUserDataByID(int $id)
+    {
+        $q = $this->conn->query("SELECT * FROM users WHERE id = $id ORDER BY id DESC LIMIT 1");
+        if($r = $q->fetch_assoc()){
+            return ['id' => $r['id'], 'name' => $r['name']];
+        }else{
+            return false;
+        }
+    }
+
+    public function isExistUserByID(int $id)
+    {
+        $res = $this->conn->query("SELECT COUNT(*) FROM users WHERE id = '$id'");
+        $row = $res->fetch_row();
+        return $row[0] > 0;        
+    }
+
+    public function isUserExist(string $name): bool
     {   
         $res = $this->conn->query("SELECT COUNT(*) FROM users WHERE name = '$name'");
         $row = $res->fetch_row();
         return $row[0] > 0;
     }
 
-    public function newUser($name): ?string
+    public function newUser(string $name): ?string
     {
         $this->conn->query("INSERT INTO users (name) VALUES ('$name')");
         $q = $this->conn->query("SELECT * FROM users WHERE name = '$name' ORDER BY id DESC LIMIT 1");

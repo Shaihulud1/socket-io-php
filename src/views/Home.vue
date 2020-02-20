@@ -13,13 +13,24 @@
 <script>
 export default {
     name: "Home",
+    created: function() {
+        let userID = localStorage.getItem("userID")
+        if (userID) {
+            this.$socket.emit("isExistID", userID)
+        }
+    },
     sockets: {
+        checkUserByID: function(data) {
+            if (data == "exist") {
+                this.$router.push("messages")
+            }
+        },
         joinStatus: function(data) {
             if (data == "exist") {
                 this.formErrors.push("user already exist")
             } else {
-                console.log("111")
                 localStorage.setItem("userID", data)
+                this.$router.push("messages")
             }
         }
     },

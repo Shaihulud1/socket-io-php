@@ -66,6 +66,35 @@ function emit(server) {
                 io.emit("joinStatus", response.data.result)
             })
         })
+        socket.on("isExistID", function(data) {
+            let dataSend = { method: "isExistID", id: data }
+            req = send2Php(dataSend, response => {
+                io.emit("checkUserByID", response.data.result)
+            })
+        })
+        socket.on("getUserDataByID", function(data) {
+            let dataSend = { method: "getUserDataByID", id: data }
+            req = send2Php(dataSend, response => {
+                let reqResponse =
+                    response.data.result == "notExist"
+                        ? response.data.result
+                        : {
+                              id: response.data.result.id,
+                              name: response.data.result.name
+                          }
+                io.emit("userData", reqResponse)
+            })
+        })
+        socket.on("sendMessage", function(data) {
+            let userID = data.id
+            let message = data.message
+            req = send2Php(
+                { method: "sendMessage", id: userID, message: data.message },
+                response => {
+                    console.log(response.data)
+                }
+            )
+        })
     })
 }
 
