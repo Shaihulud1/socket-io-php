@@ -24,12 +24,15 @@ if(isset($_POST['method']))
             $result = ['result' => $userData ? $userData : 'notExist'];                         
         break;
         case 'sendMessage':
-            if($mysql->isExistUserByID((int)$_POST['id'])){
-                $this->messData($_POST);
-                $result = ['result' => 'success'];
+            if($userData = $mysql->getUserDataByID((int)$_POST['id'])){
+                $a = $mysql->newMessage($_POST);
+                $result = ['result' => ['user' => $userData, 'message' => $_POST['message'] ] ];
             }else{
                 $result = ['result' => 'failed'];
             }
+
+        break;
+        case 'getMessages':
 
         break;
     }
@@ -49,7 +52,9 @@ class mysqlHelper{
 
     public function newMessage(array $messData)
     {
-        $this->conn->query("INSERT INTO mess (userID, message) VALUES (".$messData['userID']."'".$messData['message']."')");
+        $mesage = $messData['message'];
+        $userID = $messData['id'];
+        $this->conn->query("INSERT INTO mess (userID, message) VALUES ($userID, '$mesage')");
     }
 
     public function getUserDataByID(int $id)

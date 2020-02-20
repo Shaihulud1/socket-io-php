@@ -46,7 +46,9 @@ function send2Php(dataSend, callback) {
         .then(response => {
             callback(response)
         })
-        .catch(error => {})
+        .catch(error => {
+            console.log(error)
+        })
 }
 
 function emit(server) {
@@ -91,9 +93,24 @@ function emit(server) {
             req = send2Php(
                 { method: "sendMessage", id: userID, message: data.message },
                 response => {
-                    console.log(response.data)
+                    if (response.data != "failed") {
+                        let r = Math.random()
+                            .toString(36)
+                            .substring(7)
+                        let resp = {
+                            key: Date.now() + r,
+                            name: response.data.result.user.name,
+                            message: response.data.result.message
+                        }
+                        io.sockets.emit("addMessage", resp)
+                    }
                 }
             )
+        })
+        socket.on("getMessages", function(data) {
+            req = send2Php({ method: "getMessages" }, response => {
+                console.log(response)
+            })
         })
     })
 }

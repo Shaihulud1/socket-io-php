@@ -6,7 +6,10 @@
         <div class="messages-form-wrap">
             <div class="messages-wrap">
                 <div class="message-item">
-                    <p><span class="name">Name:</span><span>Message</span></p>
+                    <p v-for="mess in messages" :key="mess.key">
+                        <span class="name">{{ mess.name }}:</span>
+                        <span>{{ mess.message }}</span>
+                    </p>
                 </div>
             </div>
             <form action="send-mess-form" @submit="sendMessage">
@@ -29,6 +32,7 @@ export default {
         let userID = localStorage.getItem("userID")
         if (userID) {
             this.$socket.emit("getUserDataByID", userID)
+            this.$socket.emit("getMessages")
         } else {
             this.$router.push("/")
         }
@@ -42,7 +46,9 @@ export default {
                 this.nickname = data.name
             }
         },
-        newMessage: function(data) {}
+        addMessage: function(data) {
+            this.messages.push(data)
+        }
     },
     methods: {
         sendMessage: function(e) {
