@@ -33,7 +33,8 @@ if(isset($_POST['method']))
 
         break;
         case 'getMessages':
-
+            $messages = $mysql->getAllMessages();
+            $result = ['result' => $messages];
         break;
     }
     print_r(json_encode($result));
@@ -48,6 +49,16 @@ class mysqlHelper{
         if(!$this->conn){
             die('error');
         }
+    }
+
+    public function getAllMessages()
+    {
+        $q = $this->conn->query("SELECT m.id as keyID, m.userID as userID, m.message as message, u.name as name FROM mess m INNER JOIN users u ON m.userID = u.ID ORDER BY m.id ASC");
+        $messages = [];
+        while($r = $q->fetch_assoc()){
+            $messages[] = $r;
+        }
+        return $messages;
     }
 
     public function newMessage(array $messData)

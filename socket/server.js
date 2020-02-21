@@ -47,7 +47,7 @@ function send2Php(dataSend, callback) {
             callback(response)
         })
         .catch(error => {
-            console.log(error)
+            // console.log(error)
         })
 }
 
@@ -85,6 +85,10 @@ function emit(server) {
                               name: response.data.result.name
                           }
                 io.emit("userData", reqResponse)
+                req = send2Php({ method: "getMessages" }, response => {
+                    io.emit("loadMessages", response.data)
+                    // io.emit("userData", response.data.result)
+                })
             })
         })
         socket.on("sendMessage", function(data) {
@@ -98,7 +102,7 @@ function emit(server) {
                             .toString(36)
                             .substring(7)
                         let resp = {
-                            key: Date.now() + r,
+                            keyID: Date.now() + r,
                             name: response.data.result.user.name,
                             message: response.data.result.message
                         }
@@ -109,7 +113,8 @@ function emit(server) {
         })
         socket.on("getMessages", function(data) {
             req = send2Php({ method: "getMessages" }, response => {
-                console.log(response)
+                console.log("tt")
+                // io.sockets.emit("loadMessages", response.data)
             })
         })
     })

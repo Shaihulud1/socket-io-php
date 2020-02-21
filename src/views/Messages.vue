@@ -6,7 +6,7 @@
         <div class="messages-form-wrap">
             <div class="messages-wrap">
                 <div class="message-item">
-                    <p v-for="mess in messages" :key="mess.key">
+                    <p v-for="mess in messages" :key="mess.keyID">
                         <span class="name">{{ mess.name }}:</span>
                         <span>{{ mess.message }}</span>
                     </p>
@@ -32,10 +32,12 @@ export default {
         let userID = localStorage.getItem("userID")
         if (userID) {
             this.$socket.emit("getUserDataByID", userID)
-            this.$socket.emit("getMessages")
         } else {
             this.$router.push("/")
         }
+    },
+    updated: function() {
+        this.scrollChatWindow()
     },
     sockets: {
         userData: function(data) {
@@ -48,9 +50,16 @@ export default {
         },
         addMessage: function(data) {
             this.messages.push(data)
+            //this.scrollChatWindow()
+        },
+        loadMessages: function(data) {
+            this.messages = data.result
         }
     },
     methods: {
+        scrollChatWindow: function() {
+            document.getElementsByClassName("messages-wrap")[0].scrollTop = 9999
+        },
         sendMessage: function(e) {
             e.preventDefault()
             let id = localStorage.getItem("userID")
